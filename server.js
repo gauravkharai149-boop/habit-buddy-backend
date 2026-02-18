@@ -26,29 +26,16 @@ if (!JWT_SECRET || !MONGODB_URI || !GOOGLE_CLIENT_ID) {
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 /* ===========================
-   CORS FIX (IMPORTANT)
+   CORS (SAFE VERSION)
 =========================== */
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://habbit-buddy.vercel.app"
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: [
+    "http://localhost:5173",
+    "https://habbit-buddy.vercel.app"
+  ],
   credentials: true
 }));
-
-app.options("*", cors());
 
 app.use(express.json());
 
