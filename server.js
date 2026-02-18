@@ -26,14 +26,29 @@ if (!JWT_SECRET || !MONGODB_URI || !GOOGLE_CLIENT_ID) {
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 /* ===========================
-   MIDDLEWARE
+   CORS FIX (IMPORTANT)
 =========================== */
 
-// Allow your frontend (Vercel) to access backend
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://habbit-buddy.vercel.app"
+];
+
 app.use(cors({
-  origin: true,
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+
+app.options("*", cors());
 
 app.use(express.json());
 
@@ -234,7 +249,7 @@ app.delete("/api/habits/:id", auth, async (req, res) => {
 });
 
 /* ===========================
-   START SERVER (RENDER)
+   START SERVER
 =========================== */
 
 app.listen(PORT, () => {
